@@ -9,23 +9,26 @@
 
 using namespace std;
 
+template <class DT>
+class Point;    //class prototype
+
+template <class DT>
+ostream& operator <<(ostream& s, Point<DT>& otherOne);
+
+template <class DT>
 class Point	{
-protected:
-	double x;
-	double y;
+	friend ostream& operator << <DT>(ostream& s, Point<DT>& otherOne);
 public:
+	DT* x;
+	DT* y;
 	Point();
-	Point(double xvalue, double yvalue);
+	Point(DT xvalue, DT yvalue);
+	Point(Point<DT>& P); //copy constructor
+	Point<DT>& operator=(Point<DT>& P); //overloaded = operator
 	void display();
+	virtual ~Point(); //destructor
 
-	void setLocation(double xvalue, double yvalue);
-
-	double getXValue()	{
-		return x;
-	}
-	double getYValue(){
-		return y;
-	}
+	void setLocation(DT xvalue, DT yvalue);
 	 //function prototype
 
 };
@@ -35,34 +38,78 @@ double round(double var)
     return (double)value / 100.0;
 }
 
-Point::Point()
+template <class DT>
+Point<DT>::Point()
 {
-	x = 0.0;
-	y = 0.0;
-}
-Point::Point(double xvalue, double yvalue)
-{
-	x = xvalue;
-	y = yvalue;
-}
-void Point::setLocation(double xvalue, double yvalue)
-{
-	x = xvalue;
-	y = yvalue;
-}
-void Point::display()
-{
-	cout << "(" << round(x) << ", " << round(y) << ")" << endl;
+	x = NULL;
+	y = NULL;
 }
 
+template <class DT>
+Point<DT>::Point(DT xvalue, DT yvalue)
+{
+	x = new DT(xvalue);     //this constructor will be called when creating new points
+	y = new DT(yvalue);
+}
+
+template <class DT>
+void Point<DT>::setLocation(DT xvalue, DT yvalue)
+{
+	x = xvalue;
+	y = yvalue;
+}
+
+// copy constructor
+template <class DT>
+Point<DT>::Point(Point<DT>& P)
+{
+	x = (*(P.x));    //this copy constructor will be used to access the points across classes
+	y = (*(P.y));
+}
+
+template <class DT>
+Point<DT>& Point<DT>::operator=(Point<DT>& P)
+{
+	x = new DT(*(P.x));
+	y = new DT(*(P.y));
+	//cout << "Inside the overloaded = operator" << endl;
+	return (*this);
+}
+
+template <class DT>
+void Point<DT>::display()
+{
+	cout << "(" << round(*x) << ", " << round(*y) << ")" << endl;
+}
+
+template <class DT>
+ostream& operator << (ostream& s, Point<DT>& otherOne)
+{
+	s << "(" << (*otherOne.x) << ", " << (*otherOne.y) << ")";
+	return s;
+}
+
+template <class DT>
+Point <DT>:: ~Point()
+{
+	//cout << "A Point Object was destroyed" << endl;
+}
+
+template <class DT>
+class LineSegment;
+
+template <class DT>
+ostream& operator <<(ostream& s, LineSegment<DT>& one);
+
+/*
+template <class DT>
 class LineSegment {
-protected:
-	Point P1;
-	Point P2;
 public:
+	DT* PointOne;
+	DT* PointTwo;
 	LineSegment();
-	LineSegment(Point one, Point two);
-	/* Function Prototypes */
+	LineSegment(DT PointOne, DT PointTwo);
+	 Function Prototypes
 	double lengthOfLine();
 	Point midpoint();
 	Point xIntercept();
@@ -90,6 +137,7 @@ LineSegment::LineSegment(Point one, Point two)
 {
 	P1 = one;
 	P2 = two;
+
 }
 
 void LineSegment::displayLineSegment()
@@ -273,6 +321,7 @@ void Intervals::addLineSegment(LineSegment L)
 
 int main()
 {
+
 	int numOfSegments;
 	double x1, y1, x2, y2;
 
@@ -290,12 +339,12 @@ int main()
 	}
 	/*
 	 * rounded on the ouputs to have every calculation go through the rounding function
-	 */
+
 	for (int i = 0; i < numOfSegments; i++)
 	{
 		/*
 		 * all rounding done here on output to avoid autograder error
-		 */
+
 		cout << "Line Segment " << (i + 1) << ":" << endl; //colon number needs to be 1 ahead of the increment
 		interval->addLineSegment(interval->segments[i]);
 		interval->segments[i].displayLineSegment();
@@ -342,8 +391,14 @@ int main()
 		}
 
 	}
+
 }
 
+*/
+
+int main()	{
+
+}
 
 
 
