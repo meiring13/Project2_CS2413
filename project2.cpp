@@ -9,6 +9,7 @@
 
 using namespace std;
 
+//exceptions go here
 double round(double var)
 {
     double value = (int)(var * 100.0);
@@ -23,7 +24,7 @@ ostream& operator <<(ostream& s, Point<DT>& otherOne);
 
 template <class DT>
 class Point	{
-	friend ostream& operator << <DT>(ostream& s, Point<DT>& otherOne);
+	friend ostream& operator << <DT> (ostream& s, Point<DT>& otherOne);
 public:
 	DT x;
 	DT y;
@@ -32,6 +33,13 @@ public:
 	void setLocation(DT xvalue, DT yvalue);
 	void display();
 	virtual ~Point();
+
+	double getXValue()	{
+		return x;
+	}
+	double getYValue()	{
+		return y;
+	}
 	 //function prototype
 
 };
@@ -113,7 +121,7 @@ LineSegment<DT>::LineSegment()
 }
 
 template<class DT>
-LineSegment<DT>::LineSegment(Point<DT> one,Point<DT> two)
+LineSegment<DT>::LineSegment(Point<DT> one, Point<DT> two)
 {
 	PointOne = one;
 	PointTwo = two;
@@ -145,7 +153,7 @@ double LineSegment<DT>::squareroot(double a)
 {
 
 	//given square root function, modified by passing in a variable and setting k = a so i
-	//could calculate a specefic spot in the segments array
+	//could calculate a specific spot in the segments array
     double eps = 1e-6;
     double k = a;
     double l = 0.0, r, mid;
@@ -225,10 +233,8 @@ Point<DT> LineSegment<DT>::intersectionPoint(LineSegment<DT> L)
 	double xintersect = (c2 - c1)/(m1-m2);                   //got equations from reference sheet
 	double yintersect = ((c1*m2) - (c2*m1))/(m2-m1);
 
-	LineSegment<DT>intersectionPoint = new Point<DT>(xintersect, yintersect);
-
+	Point<DT> intersectionPoint(xintersect, yintersect);
 	return intersectionPoint;
-
 }
 
 template <class DT>
@@ -279,81 +285,125 @@ Point<DT> LineSegment<DT>::yIntercept()
 	return yint;
 }
 
-class Intervals	{
+template <class DT>
+class Segments;
+
+template <class DT>
+ostream& operator >> (ostream& s, Segments<DT>& one);
+
+template <class DT>
+class Segments	{
 public:
 	//changed these variables from protected to public so i can access them
-	LineSegment* segments;
+	LineSegment<DT>* segments;
 	int count;
 	int maxSize;
-	Intervals ();
-	Intervals (int size);
-	void addLineSegment(LineSegment L);
+	Segments ();
+	Segments (int size);
+	void addLineSegment(LineSegment<DT> L);
 	void display();
 
 };
 
-Intervals::Intervals()
+template <class DT>
+Segments<DT>::Segments()
 {
-	segments = new LineSegment[0];
+	segments = new LineSegment<DT>[0];
 	count = 0;
 	maxSize = 0;
 }
 
-Intervals::Intervals(int size)
+template <class DT>
+Segments<DT>::Segments(int size)
 {
-	segments = new LineSegment[size];
+	segments = new LineSegment<DT>[size];
 	count = 0;
 	maxSize = 0;
 }
 
-void Intervals::addLineSegment(LineSegment L)
+template <class DT>
+void Segments<DT>::addLineSegment(LineSegment<DT> L)
 {
 	segments[count] = L;
 	++count; //increment count to store lineSegments properly
 }
+
+//TODO make a method for creating all points
+//TODO ostream operators
 
 int main()
 {
 
 	int numOfSegments;
 	double x1, y1, x2, y2;
+	char command;
 
-	Intervals*interval = new Intervals(numOfSegments);
+	Segments<double>*interval = new Segments<double>(numOfSegments);
 
 	cin >> numOfSegments;
 
-	for (int i = 0; i < numOfSegments; i++)
+	while (!cin.eof())
 	{
-		cin >> x1 >> y1 >> x2 >> y2;
-		Point pointOne(x1, y1);
-		Point pointTwo(x2, y2);
-		LineSegment segment(pointOne, pointTwo);
-		interval->segments[i] = segment;
+		cin >> command;
+		switch (command)
+		{
+			case 'A':{}
+				for (int i = 0; i < numOfSegments; i++)
+				{
+					cin >> x1 >> y1 >> x2 >> y2;
+					Point<double> pointOne(x1, y1);
+					Point<double> pointTwo(x2, y2);
+					LineSegment<double> segment(pointOne, pointTwo);
+					interval->segments[i] = segment;
+					cout << interval->segments[i];
+				}
+				break;
+
+			case 'R':{
+				break;
+			}
+			case 'D':{
+				break;
+			}
+			case 'P':{
+				break;
+			}
+			case 'I':{
+				break;
+			}
+			case 'C':{
+				break;
+			}
+			default : cout << "Invalid command";
+
+		}
 	}
+}
+	 // rounded on the ouputs to have every calculation go through the rounding function
+
 	/*
-	 * rounded on the ouputs to have every calculation go through the rounding function
 
 	for (int i = 0; i < numOfSegments; i++)
 	{
-		/*
-		 * all rounding done here on output to avoid autograder error
 
-		cout << "Line Segment " << (i + 1) << ":" << endl; //colon number needs to be 1 ahead of the increment
+		// all rounding done here on output to avoid autograder error
+
+		cout << "Line Segment " << (i + 1) << ":"; // << endl; //colon number needs to be 1 ahead of the increment
 		interval->addLineSegment(interval->segments[i]);
-		interval->segments[i].displayLineSegment();
-		cout << "Slope:" << round(interval->segments[i].slope()) << endl;
-		Point seg(interval->segments[i].midpoint());
+		cout << interval->segments[i];
+		cout << "Slope:" << round(interval->segments[i].slope()); //<< endl;
+		Point<double> midpoint(interval->segments[i].midpoint());
 		cout << "Midpoint:";
-		seg.display();
 		cout << "X Intercept:";
-		Point Xint(interval->segments[i].xIntercept());
-		cout << round(Xint.getXValue()) << endl;
+		Point<double> Xint(interval->segments[i].xIntercept());
+		Xint.display();// << endl;
 		cout << "Y Intercept:";
-		Point Yint(interval->segments[i].yIntercept());
-		cout << round(Yint.getYValue()) << endl;
+		Point<double> Yint(interval->segments[i].yIntercept());
+		Yint.display(); // << endl;
 		cout << "Length:";
-		cout << round(interval->segments[i].lengthOfLine()) << endl;
-		cout << "y=" << round(interval->segments[i].slope()) << "*x+" << round(Yint.getYValue()) << endl;
+		cout << round(interval->segments[i].lengthOfLine()); // << endl;
+		cout << "y=" << round(interval->segments[i].slope()) << "*x+";
+		Yint.display();//<< endl;
 
 	}
 
@@ -372,12 +422,12 @@ int main()
 			else if (interval->segments[i].isParallel(interval->segments[j]))
 			{
 				cout << "The line segments compared are segments[" << i << "] and segments"
-						"[" << j << "]: Lines are Parallel" << endl;
+						"[" << j << "]: Lines are Parallel";
 			}
 			else
 			{
 				cout << "The line segments compared are segments[" << i << "] and segments"
-						"[" << j << "]: Not Parallel and not Intersecting" << endl;
+						"[" << j << "]: Not Parallel and not Intersecting";
  			}
 
 
@@ -387,7 +437,6 @@ int main()
 
 }
 
-*/
 
 int main()	{
 
@@ -398,11 +447,7 @@ int main()	{
 	LineSegment<double>* segment = new LineSegment<double>(*point, *pointTwo);
 	cout << *segment;
 }
-
-
-
-
-
+*/
 
 
 
